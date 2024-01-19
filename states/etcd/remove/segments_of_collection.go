@@ -45,11 +45,6 @@ func SegmentsOfCollectionCommand(cli clientv3.KV, basePath string) *cobra.Comman
 				return
 			}
 
-			if len(segments) != 1 {
-				fmt.Printf("failed to get segment with collection id %d state: %s, get %d result(s)\n", targetCollectionID, targetState, len(segments))
-				return
-			}
-
 			// dry run, display segment first
 			if !run {
 				//show.PrintSegmentInfo(segments[0], false)
@@ -57,16 +52,17 @@ func SegmentsOfCollectionCommand(cli clientv3.KV, basePath string) *cobra.Comman
 				return
 			}
 
-			//TODO put audit log
-			info := segments[0]
-			backupSegmentInfo(info)
-			fmt.Println("[WARNING] about to remove segment from etcd")
-			err = common.RemoveSegment(cli, basePath, info)
-			if err != nil {
-				fmt.Printf("Remove segment %d from Etcd failed, err: %s\n", info.ID, err.Error())
-				return
+			for _, segment := range segments {
+				info := segment
+				backupSegmentInfo(info)
+				fmt.Println("[WARNING] about to remove segment from etcd")
+				err = common.RemoveSegment(cli, basePath, info)
+				if err != nil {
+					fmt.Printf("Remove segment %d from Etcd failed, err: %s\n", info.ID, err.Error())
+					return
+				}
+				fmt.Printf("Remove segment %d from etcd succeeds.\n", info.GetID())
 			}
-			fmt.Printf("Remove segment %d from etcd succeeds.\n", info.GetID())
 		},
 	}
 
