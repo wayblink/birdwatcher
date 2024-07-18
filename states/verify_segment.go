@@ -30,7 +30,7 @@ func getVerifySegmentCmd(cli clientv3.KV, basePath string) *cobra.Command {
 				return
 			}
 
-			segments, err := common.ListSegmentsVersion(context.Background(), cli, basePath, etcdversion.GetVersion(), func(seg *models.Segment) bool {
+			segments, err := common.ListSegmentsVersion(context.Background(), cli, basePath, etcdversion.GetVersion(), 0, 0, func(seg *models.Segment) bool {
 				return seg.CollectionID == collectionID && seg.State == models.SegmentStateFlushed
 			})
 			if err != nil {

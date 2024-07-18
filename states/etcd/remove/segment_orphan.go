@@ -21,7 +21,7 @@ type SegmentOrphan struct {
 
 // SegmentOrphanCommand returns command to remove
 func (c *ComponentRemove) SegmentOrphanCommand(ctx context.Context, p *SegmentOrphan) error {
-	segments, err := common.ListSegmentsVersion(ctx, c.client, c.basePath, etcdversion.GetVersion(), func(segment *models.Segment) bool {
+	segments, err := common.ListSegmentsVersion(ctx, c.client, c.basePath, etcdversion.GetVersion(), p.CollectionID, 0, func(segment *models.Segment) bool {
 		return (p.CollectionID == 0 || segment.CollectionID == p.CollectionID)
 	})
 	if err != nil {

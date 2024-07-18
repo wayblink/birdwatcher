@@ -67,7 +67,7 @@ func (c *InstanceState) HealthzCheckCommand(ctx context.Context, p *HealthzCheck
 }
 
 func (c *InstanceState) checkSegmentTarget(ctx context.Context) ([]*HealthzCheckReport, error) {
-	segments, err := common.ListSegmentsVersion(ctx, c.client, c.basePath, etcdversion.GetVersion())
+	segments, err := common.ListSegmentsVersion(ctx, c.client, c.basePath, etcdversion.GetVersion(), 0, 0)
 	if err != nil {
 		return nil, err
 	}

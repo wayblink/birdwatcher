@@ -123,7 +123,7 @@ func (s *InstanceState) CheckPartitionKeyCommand(ctx context.Context, p *CheckPa
 
 		fmt.Printf("Start to check collection %s id = %d\n", collection.Schema.Name, collection.ID)
 
-		segments, err := common.ListSegmentsVersion(ctx, s.client, s.basePath, etcdversion.GetVersion(), func(segment *models.Segment) bool {
+		segments, err := common.ListSegmentsVersion(ctx, s.client, s.basePath, etcdversion.GetVersion(), 0, 0, func(segment *models.Segment) bool {
 			return segment.CollectionID == collection.ID
 		})
 		if err != nil {

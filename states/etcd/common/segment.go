@@ -23,8 +23,16 @@ const (
 )
 
 // ListSegmentsVersion list segment info as specified version.
-func ListSegmentsVersion(ctx context.Context, cli clientv3.KV, basePath string, version string, filters ...func(*models.Segment) bool) ([]*models.Segment, error) {
+func ListSegmentsVersion(ctx context.Context, cli clientv3.KV, basePath string, version string, collectionID int64, partitionID int64, filters ...func(*models.Segment) bool) ([]*models.Segment, error) {
 	prefix := path.Join(basePath, SegmentMetaPrefix) + "/"
+	if collectionID != 0 {
+		prefix = path.Join(prefix, fmt.Sprint(collectionID))
+		if partitionID != 0 {
+			prefix = path.Join(prefix, fmt.Sprint(partitionID))
+		}
+	}
+	fmt.Println("wayblink", basePath)
+
 	switch version {
 	case models.LTEVersion2_1:
 		segments, keys, err := ListProtoObjects[datapb.SegmentInfo](ctx, cli, prefix)

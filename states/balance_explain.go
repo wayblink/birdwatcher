@@ -59,7 +59,7 @@ func ExplainBalanceCommand(cli clientv3.KV, basePath string) *cobra.Command {
 				fmt.Printf("no replicas available for collection %d, cannot explain balance \n", collectionID)
 				return nil
 			}
-			segmentsInfos, _ := common.ListSegmentsVersion(context.Background(), cli, basePath, etcdversion.GetVersion())
+			segmentsInfos, _ := common.ListSegmentsVersion(context.Background(), cli, basePath, etcdversion.GetVersion(), 0, 0)
 
 			// 2. explain balance
 			explainPolicy := policies[policyName]

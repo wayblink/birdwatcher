@@ -84,7 +84,7 @@ func PullGlobalDistributionDetails(cli clientv3.KV, basePath string) *cobra.Comm
 					segmentMap := lo.SliceToMap(segmentIDs, func(id int64) (int64, struct{}) {
 						return id, struct{}{}
 					})
-					segments, err := common.ListSegmentsVersion(context.Background(), cli, basePath, etcdversion.GetVersion(), func(segment *models.Segment) bool {
+					segments, err := common.ListSegmentsVersion(context.Background(), cli, basePath, etcdversion.GetVersion(), 0, 0, func(segment *models.Segment) bool {
 						_, ok := segmentMap[segment.ID]
 						return ok
 					})

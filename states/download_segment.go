@@ -26,7 +26,7 @@ type DownloadSegmentParam struct {
 }
 
 func (s *InstanceState) DownloadSegmentCommand(ctx context.Context, p *DownloadSegmentParam) error {
-	segments, err := common.ListSegmentsVersion(ctx, s.client, s.basePath, etcdversion.GetVersion(), func(s *models.Segment) bool {
+	segments, err := common.ListSegmentsVersion(ctx, s.client, s.basePath, etcdversion.GetVersion(), 0, 0, func(s *models.Segment) bool {
 		return s.ID == p.SegmentID
 	})
 	if err != nil {
