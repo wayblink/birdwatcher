@@ -164,7 +164,7 @@ func printCompactionTask(sb *strings.Builder, task *models.CompactionTask, detai
 		fmt.Printf("WorkerID :%d\n", task.GetNodeID())
 	}
 	if task.GetTotalRows() > 0 {
-		fmt.Printf("Total Output Rows :%d\n", task.GetTotalRows())
+		fmt.Printf("Total Rows :%d\n", task.GetTotalRows())
 	}
 	if task.InputRows > 0 {
 		fmt.Printf("Total Input Rows :%d\n", task.InputRows)
