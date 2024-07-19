@@ -3,6 +3,7 @@ package show
 import (
 	"context"
 	"fmt"
+	etcdversion "github.com/milvus-io/birdwatcher/states/etcd/version"
 	"sort"
 	"strings"
 	"time"
@@ -68,6 +69,38 @@ func (c *ComponentShow) CompactionTaskCommand(ctx context.Context, p *Compaction
 	sort.Slice(compactionTasks, func(i, j int) bool {
 		return compactionTasks[i].GetPlanID() < compactionTasks[j].GetPlanID()
 	})
+
+	for _, compactionTask := range compactionTasks {
+		inputSegmentInfos, err := common.ListSegmentsVersion(ctx, c.client, c.basePath, etcdversion.GetVersion(), compactionTask.CollectionID, compactionTask.PartitionID, func(segment *models.Segment) bool {
+			return (p.CollectionID == 0 || segment.CollectionID == p.CollectionID) &&
+				(p.PartitionID == 0 || segment.PartitionID == p.PartitionID) &&
+				lo.Contains(compactionTask.InputSegments, segment.ID)
+		})
+		if err != nil {
+			return nil, err
+		}
+		var totalInputRows int64 = 0
+		for _, seg := range inputSegmentInfos {
+			totalInputRows += seg.NumOfRows
+		}
+
+		outputSegmentInfos, err := common.ListSegmentsVersion(ctx, c.client, c.basePath, etcdversion.GetVersion(), compactionTask.CollectionID, compactionTask.PartitionID, func(segment *models.Segment) bool {
+			return (p.CollectionID == 0 || segment.CollectionID == p.CollectionID) &&
+				(p.PartitionID == 0 || segment.PartitionID == p.PartitionID) &&
+				lo.Contains(compactionTask.ResultSegments, segment.ID)
+		})
+		if err != nil {
+			return nil, err
+		}
+		var totalOutputRows int64 = 0
+		for _, seg := range outputSegmentInfos {
+			totalOutputRows += seg.NumOfRows
+		}
+
+		compactionTask.InputRows = totalInputRows
+		compactionTask.OutputRows = totalOutputRows
+	}
+
 	return &CompactionTasks{
 		tasks: compactionTasks,
 		total: total,
@@ -131,7 +164,13 @@ func printCompactionTask(sb *strings.Builder, task *models.CompactionTask, detai
 		fmt.Printf("WorkerID :%d\n", task.GetNodeID())
 	}
 	if task.GetTotalRows() > 0 {
-		fmt.Printf("Total Rows :%d\n", task.GetTotalRows())
+		fmt.Printf("Total Output Rows :%d\n", task.GetTotalRows())
+	}
+	if task.InputRows > 0 {
+		fmt.Printf("Total Input Rows :%d\n", task.InputRows)
+	}
+	if task.OutputRows > 0 {
+		fmt.Printf("Total Output Rows :%d\n", task.OutputRows)
 	}
 
 	if detailSegmentIDs {

@@ -33,7 +33,9 @@ import (
 type CompactionTask struct {
 	*datapb.CompactionTask
 	// etcd collection key
-	key string
+	key        string
+	InputRows  int64
+	OutputRows int64
 }
 
 func (ct *CompactionTask) Key() string {
